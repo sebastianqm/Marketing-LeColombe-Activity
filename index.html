@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>La Colombe · Taste Lab</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Georgia',serif;background:#0a1628;color:#f0ead6;min-height:100vh}
+.hero-section{position:relative;width:100%;height:240px;overflow:hidden;background:#0a1628}
+.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s}
+.hero-video.active{opacity:0.55}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,22,40,0) 30%,rgba(10,22,40,1) 100%)}
+.hero-logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);text-align:center}
+.hero-logo{height:72px;object-fit:contain;filter:drop-shadow(0 2px 16px rgba(0,0,0,0.7))}
+.hero-badge{position:absolute;bottom:14px;width:100%;text-align:center;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#b8973a;font-family:sans-serif}
+.container{max-width:600px;margin:0 auto;padding:0 1rem}
+.screen{display:none;flex-direction:column;align-items:center;padding:1.5rem 0 3rem;animation:fi 0.35s ease}
+.screen.active{display:flex}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(0.25) rotate(-12deg);opacity:0}65%{transform:scale(1.08) rotate(2deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.55}}
+@keyframes zoomIn{0%{transform:scale(0) rotate(-5deg);opacity:0}60%{transform:scale(1.18) rotate(2deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes slideUp{0%{transform:translateY(28px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes confettiFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@keyframes shimmer{0%,100%{opacity:0.6}50%{opacity:1}}
+@keyframes glow{0%,100%{text-shadow:0 0 10px rgba(184,151,58,0.3)}50%{text-shadow:0 0 30px rgba(184,151,58,0.8),0 0 60px rgba(184,151,58,0.4)}}
+
+.eyebrow{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#b8973a;margin-bottom:6px;font-family:sans-serif;text-align:center}
+.hero-title{font-size:40px;font-weight:700;color:#f0ead6;text-align:center;line-height:1;margin-bottom:10px}
+.gold-rule{display:flex;align-items:center;gap:10px;margin-bottom:1rem;justify-content:center}
+.rule-line{width:44px;height:0.5px;background:rgba(184,151,58,0.5)}
+.rule-txt{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(184,151,58,0.45);font-family:sans-serif}
+.name-card{background:#0f2040;border:1px solid rgba(184,151,58,0.2);border-radius:18px;padding:1.75rem 1.5rem;width:100%;max-width:460px;text-align:center;margin-bottom:1rem}
+.name-question{font-size:22px;font-weight:700;color:#f0ead6;margin-bottom:6px}
+.name-sub{font-size:12px;color:#7a8faa;font-family:sans-serif;margin-bottom:1.25rem;font-style:italic;line-height:1.6}
+.name-input{width:100%;padding:14px 18px;border:1.5px solid rgba(184,151,58,0.3);border-radius:12px;font-size:20px;background:#06101e;color:#f0ead6;font-family:'Georgia',serif;text-align:center;outline:none;transition:border-color 0.2s;margin-bottom:1.25rem;letter-spacing:0.03em}
+.name-input:focus{border-color:#b8973a}
+.name-input::placeholder{color:#2a3f58;font-size:14px;font-family:sans-serif}
+.name-divider{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(184,151,58,0.4);font-family:sans-serif;margin-bottom:1rem}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-bottom:0}
+.mcard{background:#06101e;border:1px solid rgba(184,151,58,0.15);border-radius:14px;padding:1.25rem 1rem;cursor:pointer;transition:all 0.22s;text-align:center;position:relative;overflow:hidden}
+.mcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#b8973a;opacity:0;transition:opacity 0.2s}
+.mcard:hover{background:#152d4a;border-color:rgba(184,151,58,0.5);transform:translateY(-2px)}
+.mcard:hover::before{opacity:1}
+.mcard-icon{font-size:24px;margin-bottom:8px;display:block}
+.mcard-title{font-size:13px;font-weight:700;color:#f0ead6;margin-bottom:3px;font-family:sans-serif}
+.mcard-sub{font-size:11px;color:#445870;font-family:sans-serif}
+.stock-pill{display:inline-flex;align-items:center;gap:5px;background:#06101e;border:0.5px solid rgba(184,151,58,0.25);border-radius:99px;padding:7px 18px;font-size:11px;color:rgba(184,151,58,0.7);cursor:pointer;font-family:sans-serif;transition:all 0.2s}
+.stock-pill:hover{background:#0f2040;color:#b8973a}
+.pbar-wrap{width:100%;margin-bottom:1.5rem}
+.ptrack{height:1.5px;background:#152840;border-radius:99px}
+.pfill{height:100%;background:#b8973a;border-radius:99px;transition:width 0.5s ease}
+.qstep{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#b8973a;margin-bottom:10px;font-family:sans-serif;text-align:center}
+.qtext{font-size:22px;font-weight:700;color:#f0ead6;text-align:center;margin-bottom:1.75rem;line-height:1.3;max-width:420px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:11px;width:100%}
+.obtn{background:#0f2040;border:1px solid rgba(184,151,58,0.12);border-radius:13px;padding:1.1rem 0.75rem;cursor:pointer;transition:all 0.2s;text-align:center;font-family:sans-serif;color:inherit}
+.obtn:hover{background:#152d4a;border-color:rgba(184,151,58,0.45);transform:translateY(-2px)}
+.obtn:active{transform:scale(0.97)}
+.oe{font-size:22px;display:block;margin-bottom:6px}
+.ol{font-size:13px;font-weight:700;color:#f0ead6;display:block;margin-bottom:2px}
+.os{font-size:11px;color:#445870;display:block}
+.spin-container{width:110px;height:110px;position:relative;margin:1.75rem auto}
+.sring-outer{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(184,151,58,0.2);border-top-color:#b8973a;animation:spin 1s linear infinite}
+.sring-inner{position:absolute;inset:10px;border-radius:50%;border:1px solid rgba(184,151,58,0.1);border-bottom-color:rgba(184,151,58,0.4);animation:spin 0.7s linear infinite reverse}
+.stxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#445870;text-align:center;padding:22px;font-family:sans-serif;line-height:1.5;animation:pulse 1.5s ease infinite}
+.can-stage{width:130px;margin:0 auto 0.75rem;animation:pop 0.65s cubic-bezier(0.34,1.56,0.64,1) forwards}
+.can-stage img{width:100%;display:block;border-radius:10px;background:#0f2040;min-height:180px;object-fit:cover}
+.rname{font-size:24px;font-weight:700;color:#f0ead6;text-align:center;margin-bottom:4px}
+.rtag{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#b8973a;text-align:center;margin-bottom:1rem;font-family:sans-serif}
+.personal-msg{width:100%;max-width:440px;background:linear-gradient(135deg,#0f2040 0%,#152d4a 100%);border:1px solid rgba(184,151,58,0.28);border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:1rem;text-align:center}
+.personal-greeting{font-size:19px;font-weight:700;color:#b8973a;margin-bottom:8px;font-family:sans-serif}
+.personal-text{font-size:13px;color:#c0d4e8;line-height:1.75;font-family:sans-serif;margin-bottom:8px}
+.future-line{font-size:12px;color:rgba(184,151,58,0.9);font-family:sans-serif;font-style:italic;padding-top:8px;border-top:0.5px solid rgba(184,151,58,0.2)}
+.stock-badge{font-size:11px;color:#445870;margin-bottom:1rem;font-family:sans-serif;text-align:center;display:block}
+.oos-badge{font-size:11px;color:#c06060;background:#1a0a0a;padding:5px 16px;border-radius:99px;margin-bottom:1rem;font-family:sans-serif;display:inline-block}
+.actrow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.bgold{background:#b8973a;color:#06111f;border:none;border-radius:10px;padding:12px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:sans-serif;transition:all 0.2s;letter-spacing:0.03em}
+.bgold:hover{background:#caa84a;transform:translateY(-1px)}
+.bgold:active{transform:scale(0.97)}
+.boutline{background:transparent;color:#6a7f98;border:1px solid #1a2f48;border-radius:10px;padding:12px 20px;font-size:13px;cursor:pointer;font-family:sans-serif;transition:all 0.2s}
+.boutline:hover{background:#0f2040;color:#a0b0c8}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.25rem;width:100%;justify-content:center}
+.chip{background:#06101e;border:0.5px solid rgba(184,151,58,0.18);border-radius:99px;padding:6px 14px;font-size:11px;color:#6a7f98;cursor:pointer;font-family:sans-serif;transition:all 0.15s}
+.chip:hover{background:#0f2040;color:#f0ead6;border-color:rgba(184,151,58,0.45)}
+.binrow{display:flex;gap:8px;width:100%;margin-bottom:0.75rem}
+.binp{flex:1;padding:11px 16px;border:1px solid #1a2f48;border-radius:10px;font-size:13px;background:#0f2040;color:#f0ead6;font-family:sans-serif;outline:none}
+.binp:focus{border-color:rgba(184,151,58,0.5)}
+.binp::placeholder{color:#2a3f58}
+
+/* CLAIM FULL SCREEN */
+#screen-claim{display:none;position:fixed;inset:0;background:#0a1628;z-index:200;overflow-y:auto}
+.claim-bg{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,#1a3a6a 0%,#0a1628 65%);pointer-events:none}
+#confetti-container{position:fixed;inset:0;pointer-events:none;z-index:201}
+.claim-content{position:relative;z-index:202;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1rem;text-align:center}
+.claim-stars{font-size:28px;animation:shimmer 1.5s ease infinite;margin-bottom:1rem;display:block}
+.claim-can-wrap{width:150px;margin-bottom:1rem;animation:zoomIn 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards}
+.claim-can-wrap img{width:100%;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5)}
+.claim-big-emoji{font-size:56px;display:block;animation:zoomIn 0.4s 0.35s cubic-bezier(0.34,1.56,0.64,1) both;margin-bottom:0.5rem}
+.claim-title{font-size:36px;font-weight:700;color:#f0ead6;line-height:1.15;margin-bottom:0.5rem;animation:slideUp 0.5s 0.45s ease both}
+.claim-name-hl{color:#b8973a;animation:glow 2s ease infinite}
+.claim-pill{background:rgba(184,151,58,0.15);border:1px solid rgba(184,151,58,0.45);border-radius:99px;padding:8px 22px;font-size:11px;color:#b8973a;font-family:sans-serif;letter-spacing:0.14em;text-transform:uppercase;display:inline-block;animation:slideUp 0.5s 0.55s ease both;margin-bottom:1rem}
+.claim-msg{font-size:15px;color:#b8c8e0;font-family:sans-serif;line-height:1.7;max-width:340px;animation:slideUp 0.5s 0.65s ease both;margin-bottom:2rem;font-style:italic}
+.claim-btn-wrap{animation:slideUp 0.5s 0.75s ease both}
+.confetti-piece{position:fixed;border-radius:2px;animation:confettiFall linear forwards;pointer-events:none}
+
+/* ADMIN MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:300;align-items:center;justify-content:center;padding:1.5rem}
+.modal-overlay.open{display:flex}
+.modal-box{background:#0a1628;border:1px solid rgba(184,151,58,0.4);border-radius:16px;padding:1.75rem;width:100%;max-width:400px}
+.modal-title{font-size:15px;font-weight:700;color:#f0ead6;margin-bottom:1.25rem;font-family:sans-serif;letter-spacing:0.05em;display:flex;align-items:center;gap:8px}
+.modal-title span{color:#b8973a}
+
+/* Login form */
+.login-wrap{display:flex;flex-direction:column;gap:12px;margin-bottom:1rem}
+.field-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#6a7f98;font-family:sans-serif;margin-bottom:4px}
+.field-input{width:100%;padding:10px 14px;border:1px solid #1a2f48;border-radius:8px;font-size:14px;background:#0f2040;color:#f0ead6;font-family:sans-serif;outline:none}
+.field-input:focus{border-color:rgba(184,151,58,0.5)}
+.field-input::placeholder{color:#2a3f58}
+.login-error{font-size:12px;color:#e07070;font-family:sans-serif;text-align:center;min-height:18px}
+
+/* Stock editor */
+.stock-panel{display:none}
+.stock-panel.visible{display:block}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid #0f2040}
+.srow:last-child{border:none}
+.sname{font-size:12px;color:#b0c0d8;font-family:sans-serif}
+.sctrl{display:flex;align-items:center;gap:8px}
+.sqbtn{width:28px;height:28px;border:1px solid #1a2f48;border-radius:6px;background:#0f2040;color:#f0ead6;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;font-family:sans-serif;transition:background 0.15s;line-height:1}
+.sqbtn:hover{background:#152d4a}
+.sinput{width:46px;text-align:center;padding:4px;border:1px solid #1a2f48;border-radius:6px;font-size:12px;background:#06101e;color:#f0ead6;font-family:sans-serif;outline:none}
+.sync-status{font-size:11px;font-family:sans-serif;text-align:center;padding:6px;border-radius:6px;margin-top:8px;min-height:28px}
+.sync-ok{color:#7cda8a;background:rgba(100,200,100,0.1)}
+.sync-err{color:#e07070;background:rgba(200,100,100,0.1)}
+.sync-loading{color:#b8973a;animation:pulse 1s ease infinite}
+</style>
+</head>
+<body>
+
+<div id="hero-section" class="hero-section">
+  <video id="vid0" class="hero-video active" muted playsinline loop></video>
+  <video id="vid1" class="hero-video" muted playsinline loop></video>
+  <div class="hero-overlay"></div>
+  <div class="hero-logo-wrap">
+    <img class="hero-logo" src="https://drive.google.com/thumbnail?id=1gNBdYoAKL-s-Yu_eOP2W7o89fzxX9E8I&sz=w400" alt="La Colombe"/>
+  </div>
+  <div class="hero-badge">The world&#39;s frothiest draft latte &nbsp;&middot;&nbsp; Est. 1994</div>
+</div>
+
+<div class="container">
+
+  <!-- NAME + MODE -->
+  <div id="screen-name" class="screen active">
+    <div style="height:1.25rem"></div>
+    <div class="eyebrow">Coffee Workshop &middot; Philadelphia</div>
+    <div class="hero-title">Taste Lab</div>
+    <div class="gold-rule"><span class="rule-line"></span><span class="rule-txt">Find your match</span><span class="rule-line"></span></div>
+    <div class="name-card">
+      <div class="name-question">First things first...</div>
+      <div class="name-sub">&ldquo;Before we tell you who La Colombe is,<br>we want you to taste the brand first.&rdquo;</div>
+      <input class="name-input" id="name-input" type="text" placeholder="What's your name?" maxlength="30" autocomplete="off"/>
+      <div class="name-divider">Then choose your experience</div>
+      <div class="mode-grid">
+        <div class="mcard" onclick="startWithMode('quiz')">
+          <span class="mcard-icon">&#10024;</span>
+          <div class="mcard-title">Find your match</div>
+          <div class="mcard-sub">3 questions, 1 perfect drink</div>
+        </div>
+        <div class="mcard" onclick="startWithMode('barista')">
+          <span class="mcard-icon">&#9749;</span>
+          <div class="mcard-title">Barista mode</div>
+          <div class="mcard-sub">One word, one recommendation</div>
+        </div>
+      </div>
+    </div>
+    <div class="stock-pill" onclick="openModal()">&#9881; Stock &amp; reset</div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="screen">
+    <div style="height:0.75rem"></div>
+    <div class="pbar-wrap"><div class="ptrack"><div class="pfill" id="pf" style="width:0%"></div></div></div>
+    <div class="qstep" id="qs">Question 1 of 3</div>
+    <div class="qtext" id="qt"></div>
+    <div class="opts" id="qo"></div>
+  </div>
+
+  <!-- SPIN -->
+  <div id="screen-spin" class="screen">
+    <div style="height:1.5rem"></div>
+    <div class="qtext" style="font-size:18px;margin-bottom:0.25rem">Finding your perfect match...</div>
+    <div class="spin-container">
+      <div class="sring-outer"></div><div class="sring-inner"></div>
+      <div class="stxt" id="stxt">Analyzing your vibe...</div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result" class="screen">
+    <div style="height:0.5rem"></div>
+    <div class="eyebrow">Your La Colombe match</div>
+    <div id="rcanwrap"></div>
+    <div class="rname" id="rn"></div>
+    <div class="rtag" id="rt"></div>
+    <div class="personal-msg">
+      <div class="personal-greeting" id="pg"></div>
+      <div class="personal-text" id="pt"></div>
+      <div class="future-line" id="pf2"></div>
+    </div>
+    <div id="rs"></div>
+    <div class="actrow">
+      <button class="bgold" id="rclaim" onclick="claimDrink()">Claim this drink &#10003;</button>
+      <button class="boutline" onclick="goHome()">Back to start</button>
+    </div>
+  </div>
+
+  <!-- BARISTA -->
+  <div id="screen-barista" class="screen">
+    <div style="height:0.75rem"></div>
+    <div class="eyebrow" id="barista-eye">Barista Recommendation</div>
+    <div class="qtext" style="font-size:22px;margin-bottom:0.4rem">How are you feeling?</div>
+    <div style="font-size:13px;color:#7a8faa;text-align:center;font-family:sans-serif;font-style:italic;margin-bottom:1.25rem;max-width:340px">Describe yourself in one word</div>
+    <div class="chips">
+      <span class="chip" onclick="setW('exhausted')">exhausted</span><span class="chip" onclick="setW('bold')">bold</span>
+      <span class="chip" onclick="setW('sweet')">sweet</span><span class="chip" onclick="setW('adventurous')">adventurous</span>
+      <span class="chip" onclick="setW('chill')">chill</span><span class="chip" onclick="setW('classic')">classic</span>
+      <span class="chip" onclick="setW('refreshing')">refreshing</span><span class="chip" onclick="setW('strong')">strong</span>
+      <span class="chip" onclick="setW('smooth')">smooth</span><span class="chip" onclick="setW('fun')">fun</span>
+      <span class="chip" onclick="setW('focused')">focused</span><span class="chip" onclick="setW('playful')">playful</span>
+    </div>
+    <div class="binrow">
+      <input class="binp" id="bw" placeholder="Or type your own word..." maxlength="30"/>
+      <button class="bgold" onclick="doBarista()">Go &#8594;</button>
+    </div>
+    <button class="boutline" onclick="goHome()">&#8592; Back</button>
+  </div>
+
+</div>
+
+<!-- CLAIM FULL SCREEN -->
+<div id="screen-claim">
+  <div class="claim-bg"></div>
+  <div id="confetti-container"></div>
+  <div class="claim-content">
+    <span class="claim-stars">&#11088; &#9749; &#11088;</span>
+    <div class="claim-can-wrap" id="claim-can"></div>
+    <span class="claim-big-emoji" id="claim-emoji"></span>
+    <div class="claim-title" id="claim-title"></div>
+    <div class="claim-pill" id="claim-pill"></div>
+    <div class="claim-msg" id="claim-msg"></div>
+    <div class="claim-btn-wrap">
+      <button class="bgold" style="font-size:15px;padding:14px 32px" onclick="goHome()">&#8592; Play again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title">&#9881; <span>Stock Configuration</span> <span style="font-size:10px;color:#445870;margin-left:auto">Admin only</span></div>
+
+    <!-- LOGIN PANEL -->
+    <div id="login-panel">
+      <div class="login-wrap">
+        <div>
+          <div class="field-label">Username</div>
+          <input class="field-input" id="admin-user" type="text" placeholder="Enter username" autocomplete="off"/>
+        </div>
+        <div>
+          <div class="field-label">Password</div>
+          <input class="field-input" id="admin-pass" type="password" placeholder="Enter password"/>
+        </div>
+      </div>
+      <div class="login-error" id="login-err"></div>
+      <div style="display:flex;gap:8px;margin-top:0.75rem;justify-content:flex-end">
+        <button class="boutline" style="font-size:12px;padding:8px 14px" onclick="closeModal()">Cancel</button>
+        <button class="bgold" style="padding:9px 18px;font-size:12px" onclick="doAdminLogin()">Login &#8594;</button>
+      </div>
+    </div>
+
+    <!-- STOCK EDITOR PANEL -->
+    <div class="stock-panel" id="stock-panel">
+      <div id="srows"></div>
+      <div id="sync-msg" class="sync-status"></div>
+      <div style="display:flex;gap:8px;margin-top:1rem;justify-content:flex-end">
+        <button class="boutline" style="font-size:11px;padding:8px 14px" onclick="resetStockAdmin()">&#8635; Reset all</button>
+        <button class="bgold" style="padding:9px 18px;font-size:12px" onclick="saveStockAdmin()">Save &amp; close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION — replace APPS_SCRIPT_URL after deploying
+// ============================================================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGyz2ZnZXT-6DipoCcHwaDnsU0M8Oor_jWf1wzgXEAIBAuvTDmUz_B8hfF7nRfkIUWdQ/exec';
+
+const GDT = id => `https://drive.google.com/thumbnail?id=${id}&sz=w600`;
+const VIDEO_IDS=['1wM6lH0gLjL56QUDekaRnkXSSuorACSEd','15YlE4P33NMqGrGNSVtX0GYDo419IefRx','1_l8PdAAlwzmodG5n_Ur5im4L8ixKF5x-','1a13wd9g90_8nsexw388w83O6UkFaRvd-','10PivBql2XvPZwKAL_VYQHsBJ2d_RFNb8','1k0iJfexuIqN_G6yzcAwGvbkoHOaW1W9j'];
+
+const PRODS={
+  mocha:{short:'Mocha Latte',tag:'Espresso Roast · Whole Milk · Lactose Free',imgId:'1iMludeKQs_IDzn7vVDJvLQd0poH3ryO8',emoji:'☕',claimEmoji:'🌑',
+    bw:['exhausted','moody','tired','deep','dark','rich','intense','focused','serious','sophisticated','complex','mysterious'],
+    mots:[n=>`${n}, that depth in you is your superpower. Like this Mocha — rich, complex, and completely unforgettable.`,n=>`People underestimate depth, ${n}. Don't let them. This dark, velvety latte was crafted for minds like yours.`,n=>`${n}, the most interesting stories are never simple — and neither are you. This Mocha gets it.`],
+    futs:["Your focus today is building the foundation for something extraordinary tomorrow.","The clarity you're seeking is already forming. Big things are brewing for you.","Your most powerful chapter hasn't started yet — and when it does, everyone will notice."],
+    claim:n=>`The Mocha recognized your energy, ${n}. Rich, focused, unstoppable — this one was yours from the start.`},
+  caramel:{short:'Caramel Latte',tag:'Espresso Roast · Whole Milk · Lactose Free',imgId:'1eMWOuN6V8RuxsQj53jL5xM3rtkrKLIsi',emoji:'🍯',claimEmoji:'✨',
+    bw:['sweet','smooth','warm','cozy','happy','classic','chill','calm','mellow','cheerful','sunny','soft','golden'],
+    mots:[n=>`${n}, you have this rare ability to make everyone around you feel at ease. Just like this Caramel — warm, golden, and impossible not to love.`,n=>`That warmth you carry, ${n}? It's not a small thing. It changes rooms. This Caramel Latte was made for someone with your energy.`,n=>`${n}, sweetness isn't softness — it's strength. You know how to bring out the best in everything and everyone.`],
+    futs:["Something golden is coming your way. A connection, an opportunity, a moment that will make you smile for weeks.","Your positive energy is about to attract exactly the right people and places into your life.","The best version of your day hasn't happened yet — keep that warmth going."],
+    claim:n=>`Golden as you, ${n}. The Caramel Latte knew you'd find each other — warm, sweet, and totally irresistible.`},
+  vanilla:{short:'Vanilla Oat Latte',tag:'Espresso Roast · Oat Milk · Lactose Free',imgId:'1FFvIA7P3R36lBDkLomAl_LzARQMlcuCB',emoji:'🌿',claimEmoji:'🎯',
+    bw:['classic','light','airy','clean','natural','fresh','breezy','wholesome','mindful','serene','organic','conscious'],
+    mots:[n=>`${n}, being intentional about what you put into your life — your body, your mind, your time — is one of the most powerful choices a person can make.`,n=>`There's a quiet confidence in you, ${n}. Clean choices, clear vision. This Vanilla Oat was made for someone who moves with purpose.`,n=>`${n}, not everyone pays attention to the details. You do. That mindfulness is going to take you far.`],
+    futs:["A clear mind opens clear paths. You're about to see an opportunity you almost missed.","Your intentional choices are compounding quietly in the background. The results are coming.","Something fresh and exciting is on the horizon for you — stay grounded, it's yours."],
+    claim:n=>`Clean, intentional, and perfectly you, ${n}. The Vanilla Oat Latte was waiting for someone exactly like you.`},
+  triple:{short:'Triple Latte',tag:'3x Espresso · Whole Milk · Extra Bold',imgId:'1ubN4DshcPmuJU7iAlv30Rm5N50ks7b1q',emoji:'⚡',claimEmoji:'🔥',
+    bw:['strong','busy','hustling','driven','powerful','relentless','unstoppable','ambitious','determined','warrior','energized'],
+    mots:[n=>`${n}, you don't do things halfway — and that's exactly why you're going to win. This Triple Latte has 3 shots because, like you, one simply isn't enough.`,n=>`The energy you bring, ${n}, is contagious. People follow people like you. This triple espresso was built for someone who leads.`,n=>`${n}, most people quit when it gets hard. You're not most people. This can has your name on it.`],
+    futs:["That goal you've been pushing toward? You're closer than you think. Don't stop now.","Your determination is about to break through a door that's been closed for too long.","Big moves require big energy — and you have it. Something major is opening up for you."],
+    claim:n=>`Three shots for three reasons: drive, power, and YOU, ${n}. This one's for the ones who never stop.`},
+  strawberry:{short:'Strawberry Mocha',tag:'Limited Edition · Cold Brew with Milk',imgId:'1KTZIAcLiiRnLoeA-vRHD0dR2SC-XB1mN',emoji:'🌸',claimEmoji:'🌺',
+    bw:['adventurous','fun','refreshing','playful','happy','energetic','vibrant','spontaneous','fruity','fearless','bold'],
+    mots:[n=>`${n}, you have the courage to be different — and that is the rarest, most beautiful thing. Just like this Limited Edition, you are one of a kind.`,n=>`Not everyone picks the pink can, ${n}. But you do. That fearlessness? It's your edge. Don't ever lose it.`,n=>`${n}, adventure finds people who are open to it. You've got that energy — bold, bright, totally original.`],
+    futs:["An unexpected opportunity is about to find you. Say yes.","Your bold choices today are writing the best story for tomorrow. Keep going.","Something exciting and completely unexpected is headed your way. You're going to love it."],
+    claim:n=>`Limited Edition for a limited-edition person — that's you, ${n}. Bold, bright, and completely iconic.`}
+};
+
+// Local stock cache (synced from Sheets)
+const DS={strawberry:4,caramel:12,vanilla:4,mocha:4,triple:4};
+let stock={...DS},ans=[],cq=0,bmode=false,lastK='',userName='';
+let adminLoggedIn=false,tempStock={...DS};
+
+const QS=[
+  {t:"What's your morning vibe?",o:[{e:'⚡',l:'Full power',s:"Let's GO",v:'strong'},{e:'🌙',l:'Slow morning',s:'Cozy start',v:'smooth'},{e:'🎯',l:'Focused mode',s:'Work to do',v:'bold'},{e:'✨',l:'Main character',s:'All eyes on me',v:'adventurous'}]},
+  {t:"Your coffee personality...",o:[{e:'⬛',l:'Dark & rich',s:'Darker the better',v:'bold'},{e:'🍯',l:'Sweet & smooth',s:'No bitter please',v:'smooth'},{e:'🌿',l:'Light & clean',s:'Natural vibes',v:'classic'},{e:'🌶',l:'Unexpected',s:'Surprise me',v:'adventurous'}]},
+  {t:"After class you're...",o:[{e:'💻',l:'Hustling hard',s:'More work ahead',v:'strong'},{e:'🧘',l:'Taking it easy',s:'You deserve it',v:'smooth'},{e:'🎉',l:'Celebrating',s:'Treat yourself',v:'adventurous'},{e:'📚',l:'Studying more',s:'Coffee is fuel',v:'bold'}]}
+];
+const SPINS=['Analyzing your vibe...','Consulting the barista...','Shaking the can...','Almost ready...'];
+const PMAP={strong:'triple',smooth:'caramel',bold:'mocha',classic:'vanilla',adventurous:'strawberry'};
+
+// ============================================================
+// GOOGLE SHEETS API CALLS (via Apps Script)
+// ============================================================
+function apiCall(params, cb) {
+  const url = APPS_SCRIPT_URL + '?' + Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+  fetch(url)
+    .then(r => r.json())
+    .then(data => cb(null, data))
+    .catch(err => cb(err, null));
+}
+
+function loadStockFromSheets(cb) {
+  apiCall({action:'getStock'}, (err, data) => {
+    if (!err && data && data.stock) {
+      // Merge with defaults for any missing keys
+      stock = {...DS, ...data.stock};
+    }
+    if (cb) cb();
+  });
+}
+
+function claimInSheets(product, name, mode, cb) {
+  apiCall({action:'claimDrink', product, name, mode}, (err, data) => {
+    if (cb) cb(err, data);
+  });
+}
+
+function adminLoginApi(user, pass, cb) {
+  apiCall({action:'adminLogin', user, pass}, (err, data) => {
+    if (cb) cb(err, data);
+  });
+}
+
+function resetStockApi(user, pass, stockObj, cb) {
+  apiCall({action:'resetStock', user, pass, stockJson: JSON.stringify(stockObj)}, (err, data) => {
+    if (cb) cb(err, data);
+  });
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function getName(){const v=document.getElementById('name-input').value.trim();return v||'Friend';}
+
+function show(id){
+  document.getElementById('screen-claim').style.display='none';
+  document.getElementById('hero-section').style.display='';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sc=document.getElementById(id);
+  if(sc){sc.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+}
+
+function goHome(){
+  document.getElementById('screen-claim').style.display='none';
+  document.getElementById('hero-section').style.display='';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-name').classList.add('active');
+  document.getElementById('name-input').value='';
+  ans=[];cq=0;bmode=false;
+  window.scrollTo({top:0,behavior:'smooth'});
+  // Refresh stock from Sheets
+  loadStockFromSheets();
+}
+
+function startWithMode(mode){
+  userName=getName();
+  if(mode==='quiz'){ans=[];cq=0;renderQ();show('screen-quiz');}
+  else{document.getElementById('barista-eye').textContent='Hey '+userName+' — Barista Mode';show('screen-barista');}
+}
+
+function renderQ(){
+  const q=QS[cq];
+  document.getElementById('qs').textContent=`Question ${cq+1} of ${QS.length}`;
+  document.getElementById('pf').style.width=((cq/QS.length)*100)+'%';
+  document.getElementById('qt').textContent=q.t;
+  const g=document.getElementById('qo');g.innerHTML='';
+  q.o.forEach(o=>{const b=document.createElement('button');b.className='obtn';b.innerHTML=`<span class="oe">${o.e}</span><span class="ol">${o.l}</span><span class="os">${o.s}</span>`;b.onclick=()=>pick(o.v);g.appendChild(b);});
+}
+function pick(v){ans.push(v);if(cq<QS.length-1){cq++;renderQ();}else{bmode=false;spinReveal(computeMatch());}}
+function computeMatch(){const c={};ans.forEach(a=>c[a]=(c[a]||0)+1);const top=Object.entries(c).sort((a,b)=>b[1]-a[1])[0][0];return PMAP[top]||'caramel';}
+
+function setW(w){document.getElementById('bw').value=w;doBarista();}
+function doBarista(){
+  const w=document.getElementById('bw').value.trim().toLowerCase();if(!w)return;
+  let best='caramel',bs=-1;
+  for(const[k,p]of Object.entries(PRODS)){const sc=p.bw.reduce((s,bw)=>{if(w===bw)return s+10;if(bw.startsWith(w)||w.startsWith(bw))return s+5;if(bw.includes(w)||w.includes(bw))return s+2;return s;},0);if(sc>bs){bs=sc;best=k;}}
+  bmode=true;spinReveal(best);
+}
+
+function spinReveal(key){
+  show('screen-spin');let i=0;
+  const iv=setInterval(()=>{document.getElementById('stxt').textContent=SPINS[i%SPINS.length];i++;},550);
+  setTimeout(()=>{clearInterval(iv);showResult(key);},2600);
+}
+
+function showResult(key){
+  lastK=key;const p=PRODS[key];const oos=stock[key]<=0;const n=userName;
+  document.getElementById('rcanwrap').innerHTML=`<div class="can-stage"><img src="${GDT(p.imgId)}" alt="${p.short}"/></div>`;
+  document.getElementById('rn').textContent=p.short;
+  document.getElementById('rt').textContent=p.tag;
+  const mi=Math.floor(Math.random()*p.mots.length);
+  const fi=Math.floor(Math.random()*p.futs.length);
+  document.getElementById('pg').innerHTML=`Hey ${n}! ${p.emoji}`;
+  document.getElementById('pt').textContent=p.mots[mi](n);
+  document.getElementById('pf2').innerHTML='&#10024; '+p.futs[fi];
+  document.getElementById('rs').innerHTML=oos
+    ?`<span class="oos-badge">Out of stock — ask your barista for an alternative</span>`
+    :`<span class="stock-badge">${stock[key]} remaining in stock</span>`;
+  document.getElementById('rclaim').style.display=oos?'none':'';
+  show('screen-result');
+}
+
+function claimDrink(){
+  if(!lastK||stock[lastK]<=0)return;
+  const n=userName;const key=lastK;const p=PRODS[key];
+  // Optimistically update local
+  stock[key]--;
+  // Call Sheets API
+  claimInSheets(key, n, bmode?'barista':'quiz', (err, data)=>{
+    if(err||!data||data.error){
+      // Revert if failed
+      stock[key]++;
+      alert('Could not connect to inventory. Please try again.');
+      return;
+    }
+    showClaim(key);
+  });
+}
+
+function showClaim(key){
+  const p=PRODS[key];const n=userName;
+  document.getElementById('claim-can').innerHTML=`<img src="${GDT(p.imgId)}" alt="${p.short}"/>`;
+  document.getElementById('claim-emoji').textContent=p.claimEmoji;
+  document.getElementById('claim-title').innerHTML=`It&#39;s yours,&nbsp;<span class="claim-name-hl">${n}!</span>`;
+  document.getElementById('claim-pill').textContent=p.short.toUpperCase();
+  document.getElementById('claim-msg').textContent=p.claim(n);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('hero-section').style.display='none';
+  document.getElementById('screen-claim').style.display='block';
+  window.scrollTo({top:0,behavior:'instant'});
+  launchConfetti();
+}
+
+function launchConfetti(){
+  const c=document.getElementById('confetti-container');c.innerHTML='';
+  const cols=['#b8973a','#f0ead6','#4a9eff','#ff6b9d','#7cfc00','#ff8c00','#da70d6','#00ced1','#ff4500','#ffd700'];
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div');el.className='confetti-piece';
+    el.style.left=Math.random()*100+'vw';el.style.top='-20px';
+    el.style.width=(Math.random()*8+4)+'px';el.style.height=(Math.random()*16+6)+'px';
+    el.style.background=cols[Math.floor(Math.random()*cols.length)];
+    el.style.borderRadius=Math.random()>0.5?'50%':'2px';
+    el.style.animationDuration=(Math.random()*2.5+1.5)+'s';
+    el.style.animationDelay=(Math.random()*1.8)+'s';
+    c.appendChild(el);
+  }
+}
+
+// ============================================================
+// ADMIN MODAL
+// ============================================================
+function openModal(){
+  adminLoggedIn=false;
+  document.getElementById('login-panel').style.display='block';
+  document.getElementById('stock-panel').classList.remove('visible');
+  document.getElementById('admin-user').value='';
+  document.getElementById('admin-pass').value='';
+  document.getElementById('login-err').textContent='';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  adminLoggedIn=false;
+}
+
+function doAdminLogin(){
+  const user=document.getElementById('admin-user').value.trim();
+  const pass=document.getElementById('admin-pass').value;
+  document.getElementById('login-err').textContent='Verifying...';
+
+  adminLoginApi(user, pass, (err, data)=>{
+    if(!err && data && data.success){
+      adminLoggedIn=true;
+      document.getElementById('login-err').textContent='';
+      document.getElementById('login-panel').style.display='none';
+      openStockEditor();
+    } else {
+      document.getElementById('login-err').textContent='Invalid username or password.';
+    }
+  });
+}
+
+function openStockEditor(){
+  document.getElementById('stock-panel').classList.add('visible');
+  tempStock={...stock};
+  buildStockRows();
+  document.getElementById('sync-msg').textContent='';
+  document.getElementById('sync-msg').className='sync-status';
+}
+
+function buildStockRows(){
+  const sr=document.getElementById('srows');sr.innerHTML='';
+  for(const[k,p]of Object.entries(PRODS)){
+    const r=document.createElement('div');r.className='srow';
+    r.innerHTML=`<span class="sname">${p.short}</span><div class="sctrl"><button class="sqbtn" onclick="adjTemp('${k}',-1)">&#8722;</button><input type="number" class="sinput" id="si-${k}" value="${tempStock[k]||0}" min="0" max="99" onchange="tempStock['${k}']=Math.max(0,parseInt(this.value)||0)"/><button class="sqbtn" onclick="adjTemp('${k}',1)">&#43;</button></div>`;
+    sr.appendChild(r);
+  }
+}
+
+function adjTemp(k,d){
+  tempStock[k]=Math.max(0,(tempStock[k]||0)+d);
+  const el=document.getElementById('si-'+k);
+  if(el)el.value=tempStock[k];
+}
+
+function setSyncStatus(msg, type){
+  const el=document.getElementById('sync-msg');
+  el.textContent=msg;
+  el.className='sync-status '+(type==='ok'?'sync-ok':type==='err'?'sync-err':'sync-loading');
+}
+
+function saveStockAdmin(){
+  const user=document.getElementById('admin-user').value.trim()||'LaColombe';
+  const pass=document.getElementById('admin-pass').value||'123456';
+  setSyncStatus('Saving to Google Sheets...','loading');
+  resetStockApi(user, pass, tempStock, (err, data)=>{
+    if(!err && data && data.success){
+      stock={...tempStock};
+      setSyncStatus('Saved successfully ✓','ok');
+      setTimeout(()=>closeModal(), 1200);
+    } else {
+      setSyncStatus('Error saving. Check connection.','err');
+    }
+  });
+}
+
+function resetStockAdmin(){
+  if(!confirm('Reset stock to default values?')) return;
+  tempStock={...DS};
+  buildStockRows();
+  setSyncStatus('Values reset. Press Save to confirm.','loading');
+}
+
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('admin-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doAdminLogin();});
+document.getElementById('name-input').addEventListener('keydown',e=>{if(e.key==='Enter')startWithMode('quiz');});
+
+// ============================================================
+// VIDEOS
+// ============================================================
+(function(){
+  const v0=document.getElementById('vid0'),v1=document.getElementById('vid1');
+  let idx=0,active=0;const vids=[v0,v1];
+  function load(el,id,cb){el.src=`https://drive.google.com/uc?export=download&id=${id}`;el.load();el.play().catch(()=>{});el.onended=cb;}
+  function next(){
+    const nxt=(active+1)%2,prv=active;idx=(idx+1)%VIDEO_IDS.length;
+    load(vids[nxt],VIDEO_IDS[idx],next2(nxt,prv));
+    vids[nxt].classList.add('active');
+    setTimeout(()=>{vids[prv].classList.remove('active');vids[prv].src='';},1300);
+    active=nxt;
+  }
+  function next2(a,p){return function(){
+    const nxt2=(a+1)%2;idx=(idx+1)%VIDEO_IDS.length;
+    load(vids[nxt2],VIDEO_IDS[idx],next2(nxt2,a));
+    vids[nxt2].classList.add('active');
+    setTimeout(()=>{vids[a].classList.remove('active');vids[a].src='';},1300);
+    active=nxt2;
+  };}
+  load(v0,VIDEO_IDS[0],next);
+})();
+
+// ============================================================
+// INIT — load stock on startup
+// ============================================================
+loadStockFromSheets();
+</script>
+</body>
+</html>
